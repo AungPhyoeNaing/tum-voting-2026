@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist',
+    emptyOutDir: false, // Fix: Prevent Vite from deleting system files (like .user.ini)
   },
   server: {
     port: 3000,
