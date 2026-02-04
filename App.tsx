@@ -62,52 +62,52 @@ const App: React.FC = () => {
 
     if (view === 'admin-login') {
       return (
-        <div className="min-h-screen flex items-center justify-center p-4 font-sans relative overflow-hidden">
-          {/* Background Elements */}
-           <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-            <div className="absolute top-10 left-10 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob border-4 border-transparent"></div>
-            <div className="absolute bottom-10 right-10 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-2xl opacity-50 animate-blob animation-delay-2000"></div>
-          </div>
-
-          <div className="bg-white p-8 rounded-3xl w-full max-w-sm border-4 border-black shadow-neo-xl relative z-10 animate-slide-up">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-yellow-400 rounded-2xl border-4 border-black shadow-neo text-black transform -rotate-3 hover:rotate-0 transition-transform hover:scale-110 duration-300 cursor-pointer">
-                <School size={32} />
-              </div>
+        <div className="min-h-screen flex items-center justify-center p-6 font-sans">
+          <div className="water-glass p-10 rounded-[40px] w-full max-w-sm shadow-stacked relative z-10 border-white">
+            <div className="flex justify-center mb-8">
+                <div className="w-16 h-16 water-glass rounded-2xl flex items-center justify-center border-white">
+                    <School size={28} className="text-brand-accent" />
+                </div>
             </div>
-            <h2 className="text-3xl font-black text-center text-black mb-1 tracking-tight">Faculty Access</h2>
-            <p className="text-center text-slate-500 text-sm mb-6 font-bold uppercase tracking-widest bg-slate-100 inline-block px-2 mx-auto rounded border border-black transform rotate-1">Restricted Area</p>
             
-            <form onSubmit={handleAdminLogin} className="space-y-4">
+            <div className="text-center mb-10">
+              <h2 className="text-4xl font-black tracking-tighter text-brand-primary mb-2">Login</h2>
+              <p className="text-brand-muted text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Admin Gateway</p>
+            </div>
+            
+            <form onSubmit={handleAdminLogin} className="space-y-6">
               <div className={isShaking ? 'animate-shake' : ''}>
                 <input
                   type="password"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
-                  placeholder="PIN CODE"
-                  className={`w-full bg-slate-50 border-4 rounded-xl px-4 py-3 text-black focus:outline-none focus:ring-4 focus:ring-yellow-200 transition-all text-center tracking-[0.5em] text-xl font-black placeholder-slate-400
-                    ${error ? 'border-red-500 focus:border-red-500' : 'border-black focus:border-black'}
+                  placeholder="PIN"
+                  className={`w-full bg-white/60 backdrop-blur-md border border-white rounded-2xl px-6 py-5 text-brand-primary focus:outline-none focus:ring-4 focus:ring-brand-accent/10 focus:border-brand-accent/40 transition-all text-center tracking-[1em] text-2xl font-black placeholder:tracking-normal placeholder:text-sm placeholder:font-black placeholder:text-brand-muted/30
+                    ${error ? 'border-red-400 bg-red-50/50' : ''}
                   `}
                   autoFocus
                 />
               </div>
+              
               {error && (
-                <div className="text-red-500 text-xs flex items-center justify-center gap-2 bg-red-50 py-2 rounded-lg font-black border-2 border-red-200 animate-pulse">
+                <div className="text-red-500 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 bg-red-50/80 backdrop-blur-md py-4 rounded-xl border border-red-100">
                   <AlertCircle size={14} /> {error}
                 </div>
               )}
+
               <button
                 type="submit"
-                className="w-full bg-black hover:bg-slate-800 text-white font-black py-3.5 rounded-xl transition-all shadow-neo hover:shadow-neo-lg active:scale-95 active:shadow-none hover:-translate-y-1 border-2 border-transparent"
+                className="w-full bg-brand-primary hover:bg-brand-accent text-white font-black py-5 rounded-2xl transition-all duration-300 shadow-stacked uppercase tracking-widest text-sm"
               >
-                Access Dashboard
+                Enter Dashboard
               </button>
+              
               <button
                 type="button"
                 onClick={() => { window.location.hash = ''; }}
-                className="w-full text-slate-500 text-sm py-2 hover:text-black rounded-lg transition-colors font-bold flex items-center justify-center gap-2 hover:bg-slate-100 border-2 border-transparent hover:border-black"
+                className="w-full text-brand-muted text-[10px] font-black tracking-widest uppercase py-2 hover:text-brand-primary transition-colors flex items-center justify-center gap-2"
               >
-                <ArrowLeft size={14} /> Back to Voting
+                <ArrowLeft size={14} /> Back
               </button>
             </form>
           </div>

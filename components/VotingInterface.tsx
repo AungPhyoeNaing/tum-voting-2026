@@ -33,34 +33,41 @@ const triggerConfetti = async () => {
   fire(0.1, { spread: 120, startVelocity: 45 });
 };
 
-// Sub-component for efficient display (Image removed)
-const LazyImageCard = ({ candidate, onClick, isVoted, gradient, index }: any) => {
+// Sub-component for efficient display (Water-Glass Stacked)
+const LazyImageCard = ({ candidate, onClick, isVoted }: any) => {
     
     return (
         <div 
             onClick={onClick}
             className={`
-            relative group rounded-3xl overflow-hidden cursor-pointer bg-white border-4 border-black shadow-neo transform transition-transform duration-150
-            ${isVoted ? 'opacity-50 grayscale pointer-events-none' : 'active:scale-95 hover:-translate-y-1 hover:shadow-neo-xl hover:rotate-1 md:animate-float'}
+            relative group rounded-3xl overflow-hidden cursor-pointer transition-all duration-300 water-card shadow-stacked
+            ${isVoted ? 'opacity-40 grayscale pointer-events-none' : 'hover:shadow-water-light hover:-translate-y-1 active:scale-[0.99]'}
+            w-full
             `}
-            style={{ 
-                animationDuration: `${6 + Math.random()}s`
-            }}
         >
-            {/* Number Container (Replaces Image) */}
-            <div className="aspect-[4/5] bg-yellow-100 relative overflow-hidden rounded-xl m-2 border-2 border-black flex items-center justify-center">
-                <span className="text-6xl font-black text-black/20 select-none">#{candidate.number}</span>
-                <div className="absolute top-2 left-2 bg-white text-black text-xs font-black px-2 py-1 rounded-lg border-2 border-black shadow-neo-sm z-10 transform -rotate-6">
-                    #{candidate.number}
+            <div className="flex items-center p-4 gap-6">
+                {/* Number Plate (Water Reflection style) */}
+                <div className="w-24 h-24 rounded-2xl bg-white/40 flex items-center justify-center border border-white/60 shadow-inner overflow-hidden flex-shrink-0">
+                    <span className="text-4xl font-black text-brand-accent/30 select-none tracking-tighter">
+                        {candidate.number}
+                    </span>
+                </div>
+                
+                <div className="flex-1">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <p className="text-[10px] font-black text-brand-accent uppercase tracking-[0.2em] mb-1">{candidate.class}</p>
+                            <h3 className="text-xl font-black tracking-tighter text-brand-primary">{candidate.name}</h3>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl water-glass flex items-center justify-center group-hover:bg-brand-accent group-hover:text-white transition-all duration-300">
+                            <ChevronRight size={20} />
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div className="p-3 text-center">
-            <h3 className="text-black font-extrabold text-lg leading-relaxed py-1">{candidate.name}</h3>
-            <p className="text-black text-xs font-bold uppercase tracking-wider bg-yellow-300 inline-block px-3 py-1 rounded-full border-2 border-black mt-2 group-hover:bg-yellow-400 transition-colors transform rotate-1">
-                {candidate.class}
-            </p>
-            </div>
+            {/* Liquid highlight line */}
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/80 to-transparent" />
         </div>
     );
 };
@@ -115,13 +122,13 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
     
     if (result.success) {
       setVotedCategories(prev => ({ ...prev, [activeCategory]: true }));
-      setShowConfirmModal(false); // Close confirmation immediately
+      setShowConfirmModal(false);
       setShowSuccess(true);
-      triggerConfetti(); // 🎉
+      triggerConfetti(); 
       setTimeout(() => {
         setShowSuccess(false);
         setSelectedCandidate(null);
-      }, 3500); // Slightly longer to enjoy confetti
+      }, 3000);
     } else {
       alert(result.error || 'Failed to submit vote.');
       setShowConfirmModal(false);
@@ -132,246 +139,175 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
   const filteredCandidates = CANDIDATES.filter(c => c.categoryId === activeCategory);
   const currentCategory = CATEGORIES.find(c => c.id === activeCategory);
   
-  // Dynamic gradient based on category (Cartoony flat colors)
-  const getGradient = (catId: string) => {
-    switch(catId) {
-      case CategoryId.KING: return 'from-blue-400 to-blue-500';
-      case CategoryId.QUEEN: return 'from-pink-400 to-pink-500';
-      case CategoryId.MISTER: return 'from-teal-400 to-teal-500';
-      case CategoryId.MISS: return 'from-purple-400 to-purple-500';
-      default: return 'from-slate-400 to-slate-600';
-    }
-  };
-  
-  const getCategoryColor = (catId: string) => {
-     switch(catId) {
-      case CategoryId.KING: return 'bg-cartoon-blue';
-      case CategoryId.QUEEN: return 'bg-cartoon-red';
-      case CategoryId.MISTER: return 'bg-cartoon-green';
-      case CategoryId.MISS: return 'bg-cartoon-purple';
-      default: return 'bg-slate-400';
-    }
-  }
-
-  const getIcon = (catId: string) => {
-    switch(catId) {
-      case CategoryId.KING: return <Crown size={16} className="text-black fill-white" />;
-      case CategoryId.QUEEN: return <Star size={16} className="text-black fill-white" />;
-      case CategoryId.MISTER: return <Zap size={16} className="text-black fill-white" />;
-      case CategoryId.MISS: return <Heart size={16} className="text-black fill-white" />;
-      default: return <Sparkles size={16} />;
-    }
-  }
-
-  const activeColor = getCategoryColor(activeCategory);
-  const activeGradient = getGradient(activeCategory); // Keep for some gradient usages
-
   return (
-    <div className="min-h-screen relative overflow-x-hidden font-sans pb-32">
+    <div className="min-h-screen text-brand-primary font-sans">
       
-      {/* Background Decorative Blobs */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none opacity-50">
-        <div className="absolute top-10 -left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob border-4 border-transparent"></div>
-        <div className="absolute top-10 -right-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-20 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
-      </div>
-
-      {/* Sticky Header with Blur */}
-      <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b-4 border-black shadow-sm transition-all duration-300 pt-2 pb-1">
-        <div className="max-w-md mx-auto w-full">
-            <div className="px-4 py-3 flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                    <div className={`${activeColor} p-2 rounded-xl text-white border-2 border-black shadow-neo-sm transition-all duration-500 hover:scale-110`}>
-                       <Sparkles size={20} className="animate-pulse-fast text-black fill-white" />
-                    </div>
-                    <div className="flex flex-col">
-                    <h1 className="text-2xl font-black text-black leading-none tracking-tight drop-shadow-sm">
-                        CEIT Fresher Welcome!!!
-                    </h1>
-                    <span className="text-xs uppercase font-bold text-black tracking-widest bg-yellow-300 p-1 mt-1 rounded-sm transform -rotate-1 inline-block w-max border border-black">Voteလိုက်နော်</span>
-                    </div>
-                </div>
-                <button onClick={onAdminClick} className="text-black hover:text-indigo-600 transition-colors bg-white p-2 rounded-full border-2 border-black shadow-neo-sm hover:shadow-neo active:translate-y-1 active:shadow-none">
-                    <Lock size={18} />
-                </button>
+      {/* Defined Water Header */}
+      <header className="sticky top-0 z-40 water-glass border-b border-white/60">
+        <div className="max-w-xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div className="flex flex-col">
+                <h1 className="text-2xl font-black tracking-tighter leading-none text-brand-primary">CEIT<span className="text-brand-accent">.</span>VOTE</h1>
+                <span className="text-[10px] font-black text-brand-muted tracking-[0.3em] uppercase mt-1">Fresher Celebration</span>
             </div>
             
-            {/* Category Selector with Fixed Height Container to prevent jumping */}
-            <div className="relative w-full">
-                <div className="flex overflow-x-auto no-scrollbar gap-4 px-4 items-center pt-4 pb-4 snap-x">
-                    {CATEGORIES.map(cat => {
-                    const isVoted = votedCategories[cat.id];
+            <button 
+                onClick={onAdminClick} 
+                className="w-10 h-10 flex items-center justify-center rounded-xl water-glass hover:bg-brand-accent hover:text-white transition-all duration-300"
+            >
+                <Lock size={18} />
+            </button>
+        </div>
+        
+        {/* Sharp Segmented Switcher */}
+        <div className="max-w-xl mx-auto px-6 pb-6">
+            <div className="flex bg-slate-900/5 p-1.5 rounded-2xl border border-white/40">
+                {CATEGORIES.map(cat => {
                     const isActive = activeCategory === cat.id;
-                    const catColor = getCategoryColor(cat.id);
-                    
+                    const isVoted = votedCategories[cat.id];
                     return (
                         <button
-                        key={cat.id}
-                        onClick={() => setActiveCategory(cat.id)}
-                        className={`
-                            relative whitespace-nowrap px-6 py-3 rounded-2xl text-base font-black transition-all duration-200 flex items-center gap-2 flex-shrink-0 border-2 border-black snap-center
-                            ${isActive 
-                            ? `${catColor} text-black shadow-neo scale-105 z-10 transform -rotate-2` 
-                            : 'bg-white text-slate-500 hover:bg-slate-50'
-                            }
-                            ${isVoted && !isActive ? 'opacity-60 grayscale' : ''}
-                            active:scale-95 active:shadow-none active:translate-y-1
-                        `}
+                            key={cat.id}
+                            onClick={() => setActiveCategory(cat.id)}
+                            className={`
+                                flex-1 py-3 rounded-xl text-[11px] font-black tracking-widest transition-all duration-300 flex items-center justify-center gap-2
+                                ${isActive ? 'bg-white shadow-stacked text-brand-accent' : 'text-brand-muted hover:text-brand-primary'}
+                                ${isVoted && !isActive ? 'opacity-40' : ''}
+                            `}
                         >
-                        {getIcon(cat.id)}
-                        {cat.label}
+                            {isVoted && <CheckCircle2 size={14} />}
+                            {cat.label}
                         </button>
                     );
-                    })}
-                    {/* Large spacer to ensure last item is fully visible and touchable */}
-                    <div className="w-4 flex-shrink-0"></div>
-                </div>
+                })}
             </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-md mx-auto px-4 mt-8">
+      {/* Main Content (Stacked Column) */}
+      <main className="max-w-xl mx-auto px-6 pt-12 pb-32">
         {!isSystemOpen ? (
-            <div className="text-center py-12 px-6 bg-white rounded-3xl border-4 border-black shadow-neo animate-slide-up">
-                <div className="inline-block bg-yellow-300 p-5 rounded-full border-2 border-black shadow-neo mb-6 animate-bounce">
-                    <Lock size={48} className="text-black" />
+            <div className="text-center py-20 px-8 water-glass rounded-[40px] shadow-stacked animate-slide-up border-white/80">
+                <div className="w-20 h-20 bg-brand-surface rounded-3xl flex items-center justify-center mx-auto mb-8 border border-white/60">
+                    <Lock size={32} className="text-brand-accent" />
                 </div>
-                <h2 className="text-3xl font-black text-black mb-3 tracking-tight">VOTING CLOSED</h2>
-                <p className="text-slate-600 font-bold mb-6">
-                    The voting lines are currently paused. Please wait for the admin to open them.
+                <h2 className="text-4xl font-black tracking-tighter mb-4">VOTING CLOSED</h2>
+                <p className="text-brand-muted font-bold text-sm tracking-wide">
+                    Lines are currently frozen.
                 </p>
-                <div className="inline-block bg-slate-100 px-4 py-2 rounded-xl border-2 border-black font-mono text-xs font-bold text-slate-400">
-                    STATUS: <span className="text-red-500">LOCKED</span>
-                </div>
             </div>
         ) : (
             <>
-                <div className="mb-8 text-center animate-fade-in">
-                {votedCategories[activeCategory] ? (
-                    <div className="bg-emerald-100 inline-flex items-center gap-2 px-6 py-3 rounded-full text-black font-black border-2 border-black shadow-neo animate-pulse-fast text-lg">
-                        <CheckCircle2 size={24} className="text-emerald-600 fill-white" /> VOTE REGISTERED!
+                <div className="mb-10 flex items-center justify-between animate-fade-in">
+                    <div>
+                        <h2 className="text-5xl font-black tracking-tighter text-brand-primary">{currentCategory?.label}</h2>
+                        <div className="h-1 w-12 bg-brand-accent mt-2 rounded-full" />
                     </div>
-                ) : (
-                    <p className="text-black font-bold bg-white inline-block px-5 py-2 rounded-full text-base border-2 border-black shadow-neo-sm transform rotate-1">
-                    👇 ပုံလေးနှိပ်ပြီး Vote ပါ သူငယ်ချင်း
-                    </p>
-                )}
+                    {votedCategories[activeCategory] && (
+                        <div className="water-glass px-5 py-2 rounded-full text-[10px] font-black tracking-[0.2em] uppercase flex items-center gap-2 text-emerald-600 border-emerald-100">
+                           <CheckCircle2 size={14} /> VOTED
+                        </div>
+                    )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 pb-10">
-                {filteredCandidates.map((candidate, idx) => (
-                    <LazyImageCard 
-                        key={candidate.id}
-                        candidate={candidate}
-                        index={idx}
-                        isVoted={votedCategories[activeCategory]}
-                        onClick={() => handleVote(candidate)}
-                        gradient={activeGradient}
-                    />
-                ))}
+                <div className="flex flex-col gap-6 animate-slide-up">
+                    {filteredCandidates.map((candidate) => (
+                        <LazyImageCard 
+                            key={candidate.id}
+                            candidate={candidate}
+                            isVoted={votedCategories[activeCategory]}
+                            onClick={() => handleVote(candidate)}
+                        />
+                    ))}
                 </div>
             </>
         )}
       </main>
 
-      {/* Fun Expanded Profile Modal */}
+      {/* Water Drawer */}
       {selectedCandidate && (
         <div 
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in p-0 sm:p-4" 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-brand-primary/20 backdrop-blur-md animate-fade-in p-4" 
           onClick={() => setSelectedCandidate(null)}
         >
           <div 
-            className="bg-white w-full max-w-sm sm:rounded-3xl rounded-t-3xl shadow-2xl animate-slide-up flex flex-col max-h-[90vh] overflow-hidden relative border-4 border-black"
+            className="bg-white/90 backdrop-blur-3xl w-full max-w-xl sm:rounded-[48px] rounded-[48px] shadow-2xl animate-slide-up overflow-hidden border-t border-white flex flex-col max-h-[90vh]"
             onClick={e => e.stopPropagation()}
           >
-            {/* Close Button */}
-            <button 
-              onClick={() => setSelectedCandidate(null)}
-              className="absolute top-4 right-4 z-20 bg-white hover:bg-slate-100 text-black p-2 rounded-full border-2 border-black shadow-neo transition-all hover:rotate-90"
-            >
-                <X size={24} />
-            </button>
-
-            {/* Content */}
-            <div className="p-6 pt-12 flex flex-col relative z-10 overflow-y-auto no-scrollbar">
-               <div className="text-center">
-                 <span className={`inline-block px-4 py-1.5 mt-1 rounded-full text-md font-black text-black ${activeColor} mb-3 border-2 border-black shadow-neo transform -rotate-2`}>
-                    #{selectedCandidate.number}
-                 </span>
-                 <h3 className="text-4xl font-black text-black leading-snug mb-4 drop-shadow-sm">
-                    {selectedCandidate.name}
-                 </h3>
+            {/* Grab Handle */}
+            <div className="w-12 h-1.5 bg-black/10 rounded-full mx-auto mt-4 mb-2 flex-shrink-0" />
+            
+            <div className="p-6 pt-4 sm:p-12 sm:pt-8 text-center overflow-y-auto custom-scrollbar"> {/* Added overflow-y-auto and custom-scrollbar */}
+               <div className="flex justify-between items-start mb-6 sm:mb-10">
+                 <div>
+                    <span className="text-brand-accent text-xs font-black tracking-[0.4em] uppercase block mb-1 opacity-60">Candidate {selectedCandidate.number}</span>
+                    <h3 className="text-3xl sm:text-4xl font-black tracking-tighter text-brand-primary leading-tight">
+                        {selectedCandidate.name}
+                    </h3>
+                 </div>
+                 <button 
+                    onClick={() => setSelectedCandidate(null)}
+                    className="w-12 h-12 rounded-xl water-glass flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-colors"
+                 >
+                    <X size={24} />
+                 </button>
                </div>
 
-               <div className="mt-auto space-y-3 pb-4">
-                  <button
-                    onClick={handleInitiateVote}
-                    className={`
-                      w-full py-4 rounded-2xl font-black text-white ${activeColor} border-4 border-black shadow-neo-xl
-                      hover:translate-y-1 hover:shadow-neo active:shadow-none transition-all flex items-center justify-center gap-2 text-xl animate-pulse-fast
-                    `}
-                  >
-                    <Star className="text-black fill-white" size={24} /> VOTE NOW
-                  </button>
-               </div>
+               <button
+                onClick={handleInitiateVote}
+                className="w-full py-5 rounded-3xl font-black text-white bg-brand-primary hover:bg-brand-accent transition-all duration-500 flex items-center justify-center gap-4 text-xl shadow-stacked"
+               >
+                CAST VOTE <ChevronRight size={24} />
+               </button>
+               
+               <button 
+                onClick={() => setSelectedCandidate(null)}
+                className="mt-4 w-full py-3 text-brand-muted font-black text-sm"
+               >
+                Cancel
+               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Confirmation Modal */}
+      {/* Water Confirmation */}
       {showConfirmModal && selectedCandidate && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-md p-6 animate-fade-in">
-          <div className="bg-white rounded-3xl w-full max-w-xs p-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] animate-slide-up relative overflow-hidden">
-             
-            <div className="flex flex-col items-center text-center mt-2">
-              <div className="w-24 h-24 rounded-full border-4 border-black shadow-neo mb-4 overflow-hidden bg-slate-100 flex items-center justify-center">
-                 <span className="text-3xl font-black text-slate-400">#{selectedCandidate.number}</span>
-              </div>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-brand-primary/10 backdrop-blur-xl p-6 animate-fade-in">
+          <div className="max-w-sm w-full water-glass rounded-[40px] p-10 text-center border-white shadow-2xl">
+             <h3 className="text-3xl font-black tracking-tighter mb-4">Confirm?</h3>
+             <p className="text-slate-500 font-bold mb-12 text-balance">
+                You are voting for <span className="text-brand-primary font-black underline decoration-brand-accent decoration-4">{selectedCandidate.name}</span>.
+             </p>
               
-              <h3 className="text-3xl font-black text-black mb-3">ပေးမှာသေချာပြီလား</h3>
-              <p className="text-slate-600 text-sm mb-6 font-bold bg-yellow-100 px-3 py-1 border-2 border-black rounded-lg transform rotate-1">
-                Voting for <span className="text-black font-black">{selectedCandidate.name}</span>
-              </p>
-              
-              <div className="flex gap-3 w-full">
-                <button 
-                  onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 py-3 px-4 rounded-xl font-bold text-black bg-slate-200 border-2 border-black shadow-neo hover:translate-y-1 hover:shadow-none transition-all"
-                >
-                  Nope
-                </button>
+             <div className="flex flex-col gap-3">
                 <button 
                   onClick={confirmVote}
                   disabled={isSubmitting}
-                  className={`flex-1 py-3 px-4 rounded-xl font-bold text-white ${activeColor} border-2 border-black shadow-neo hover:translate-y-1 hover:shadow-none transition-all flex justify-center items-center`}
+                  className="w-full py-5 rounded-2xl font-black text-white bg-brand-primary hover:bg-brand-accent transition-all shadow-stacked"
                 >
-                  {isSubmitting ? (
-                    <div className="w-5 h-5 border-4 border-black border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    "YAAAS!"
-                  )}
+                  {isSubmitting ? "Submitting..." : "YES, I'M SURE"}
                 </button>
-              </div>
-            </div>
+                <button 
+                  onClick={() => setShowConfirmModal(false)}
+                  className="w-full py-4 rounded-2xl font-black text-brand-muted hover:text-brand-primary transition-colors"
+                >
+                  Go Back
+                </button>
+             </div>
           </div>
         </div>
       )}
 
-      {/* Success Overlay - Confetti Style */}
+      {/* Success View (Water Splash style) */}
       {showSuccess && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in" onClick={() => setShowSuccess(false)}>
-          <div className="text-center p-8 max-w-xs w-full animate-slide-up relative bg-white border-4 border-black rounded-3xl shadow-neo-xl">
-            
-            <div className="relative">
-                <div className="w-24 h-24 bg-green-400 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-black shadow-neo animate-bounce-small">
-                <CheckCircle2 size={48} className="text-black fill-white" />
+        <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-white/95 backdrop-blur-3xl animate-fade-in">
+            <div className="text-center animate-scale-in">
+                <div className="w-32 h-32 bg-brand-accent rounded-[40px] flex items-center justify-center mx-auto mb-10 shadow-2xl rotate-12">
+                    <CheckCircle2 size={64} className="text-white" />
                 </div>
-                <h2 className="text-4xl font-black text-black mb-2 tracking-tight">VOTED!</h2>
-                <p className="text-black font-bold bg-yellow-300 inline-block px-3 py-1 border-2 border-black transform -rotate-2">You're awesome!</p>
+                <h2 className="text-7xl font-black text-brand-primary tracking-tighter mb-4">VOTED!</h2>
+                <p className="text-brand-accent font-black tracking-[0.4em] uppercase text-sm">Thank you for participating</p>
             </div>
-          </div>
         </div>
       )}
     </div>
