@@ -1,0 +1,38 @@
+# ----------------------------------------------------------------------
+# FIX FOR API 404 & "Unexpected token <" ERRORS
+# ----------------------------------------------------------------------
+#
+# The problem is that Nginx is handling the traffic and only sees your
+# "dist" folder (Frontend). It doesn't know that "/api" requests need
+# to go to your Node.js server.
+#
+# COPY AND PASTE THIS into your Nginx Configuration File.
+# (In aaPanel: Website -> Settings -> Config / Configuration)
+# ----------------------------------------------------------------------
+
+server {
+    listen 80;
+    server_name yourdomain.com; # (Your actual domain will be here)
+    
+    # 1. ROOT DIRECTORY (For the frontend files)
+    root /www/wwwroot/your_project_folder/dist;
+    index index.html;
+
+    # 2. MAIN APP (Frontend)
+    # If a file exists (like image.png), serve it.
+    # Otherwise, show index.html (React handles the routing).
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # 3. API & BACKEND (The Missing Part!)
+    # Send any request starting with /api OR /admin to the Node.js app
+    location ~ ^/(api|admin) {
+        proxy_pass http://127.0.0.1:3005;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
