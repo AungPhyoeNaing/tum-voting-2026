@@ -278,7 +278,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
               <p className="text-[10px] text-brand-muted/70 font-medium mt-2">Adjust max votes per IP (e.g., from public Wi-Fi hotspots).</p>
             </div>
             <button 
-                onClick={() => { if(confirm("DANGER: Wipe all database records?")) resetAllVotes() }}
+                onClick={() => { 
+                    const password = prompt("Enter Admin Password to CONFIRM RESET:");
+                    if (password === "45644779") {
+                        if(confirm("FINAL WARNING: This will permanently delete ALL votes. Proceed?")) {
+                            resetAllVotes();
+                        }
+                    } else if (password !== null) {
+                        alert("Incorrect Password");
+                    }
+                }}
                 className="w-full mt-4 py-3 text-sm font-black text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-stacked hover:shadow-water-light transition-all uppercase tracking-wide"
             >
             RESET ALL VOTES
