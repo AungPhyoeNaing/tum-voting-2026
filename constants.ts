@@ -22,11 +22,12 @@ export const CANDIDATES: Candidate[] = [
   { id: 'q6', number: '06', name: 'မအိအိလွင်', class: '06', categoryId: CategoryId.QUEEN, quote: "Be the change.", bio: "Environmental club president." },
   { id: 'q7', number: '07', name: 'မဟန်နီကို', class: '07', categoryId: CategoryId.QUEEN, quote: "Connect, collaborate, create.", bio: "Networking specialist." },
   { id: 'q8', number: '08', name: 'မနန်ဖွေးလောဝ်', class: '08', categoryId: CategoryId.QUEEN, quote: "Grace under pressure.", bio: "Public speaking champion." },
-  { id: 'q9', number: '09', name: 'မဇူးဇူအောင်', class: '09', categoryId: CategoryId.QUEEN, quote: "Logic will get you from A to B. Imagination will take you everywhere.", bio: "Algorithm ace." },
+  { id: 'q9', number: '09', name: 'မယုမွန်ထွန်း', class: '09', categoryId: CategoryId.QUEEN, quote: "Logic will get you from A to B. Imagination will take you everywhere.", bio: "Algorithm ace." },
+  { id: 'q10', number: '10', name: 'မဇူးဇူးအောင်', class: '10', categoryId: CategoryId.QUEEN, quote: "Logic will get you from A to B. Imagination will take you everywhere.", bio: "Algorithm ace." },
 
   // --- MISTER Candidates (8) ---
   { id: 'm1', number: '01', name: 'မောင်စစ်မင်းနိုင်', class: '01', categoryId: CategoryId.MISTER, quote: "I'm just Ken... enough.", bio: "Bringing charm and AI expertise." },
-  { id: 'm2', number: '02', name: 'မောင်ညဏ်လင်း', class: '02', categoryId: CategoryId.MISTER, quote: "Laughter is the best debugger.", bio: "Class clown." },
+  { id: 'm2', number: '02', name: 'မောင်ဉာဏ်လင်း', class: '02', categoryId: CategoryId.MISTER, quote: "Laughter is the best debugger.", bio: "Class clown." },
   { id: 'm3', number: '03', name: 'မောင်သာထက်စံ', class: '03', categoryId: CategoryId.MISTER, quote: "Bringing sexy back to code.", bio: "Musician and coder." },
   { id: 'm4', number: '04', name: 'မောင်ဝေဖြိုး', class: '04', categoryId: CategoryId.MISTER, quote: "I see everything.", bio: "Data analyst with vision." },
   { id: 'm5', number: '05', name: 'မောင်မျိုးသီဟကျော်', class: '05', categoryId: CategoryId.MISTER, quote: "With great power comes great responsibility.", bio: "Web crawler." },
@@ -37,7 +38,7 @@ export const CANDIDATES: Candidate[] = [
   // --- MISS Candidates (7) ---
   { id: 'ms1', number: '01', name: 'မသွန်းရတီထွန်း', class: '01', categoryId: CategoryId.MISS, quote: "Data tells a story.", bio: "Data Science major." },
   { id: 'ms2', number: '02', name: 'မရှင်းရှင်းသန့်', class: '02', categoryId: CategoryId.MISS, quote: "Shake it off, code it up.", bio: "Web wizard." },
-  { id: 'ms3', number: '03', name: 'မစီစီလျာခေါန်ရိန်', class: '03', categoryId: CategoryId.MISS, quote: "Thank u, next (bug).", bio: "Vocal about variable naming." },
+  { id: 'ms3', number: '03', name: 'မစီစီလျားခေါန်ရိန်', class: '03', categoryId: CategoryId.MISS, quote: "Thank u, next (bug).", bio: "Vocal about variable naming." },
   { id: 'ms4', number: '04', name: 'မယွန်းနဒီဇော်', class: '04', categoryId: CategoryId.MISS, quote: "Kill 'em with kindness.", bio: "Community manager." },
   { id: 'ms5', number: '05', name: 'မအိအိအောင်', class: '05', categoryId: CategoryId.MISS, quote: "Duh.", bio: "Alternative thinker." },
   { id: 'ms6', number: '06', name: 'မထက်ဆုရတီ', class: '06', categoryId: CategoryId.MISS, quote: "New rules.", bio: "Defining new protocols." },
