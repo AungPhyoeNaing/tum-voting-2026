@@ -8,31 +8,6 @@ interface VotingInterfaceProps {
   onAdminClick: () => void;
 }
 
-// Trigger Confetti
-const triggerConfetti = async () => {
-  const confetti = (await import('canvas-confetti')).default;
-  const count = 200;
-  const defaults = {
-    origin: { y: 0.7 },
-    zIndex: 9999
-  };
-
-  function fire(particleRatio: number, opts: any) {
-    confetti({
-      ...defaults,
-      ...opts,
-      particleCount: Math.floor(count * particleRatio)
-    });
-  }
-
-  fire(0.25, { spread: 26, startVelocity: 55 });
-
-  fire(0.2, { spread: 60 });
-  fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
-  fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-  fire(0.1, { spread: 120, startVelocity: 45 });
-};
-
 // Sub-component for efficient display (Water-Glass Stacked)
 const LazyImageCard = ({ candidate, onClick, isVoted }: any) => {
     
@@ -47,8 +22,8 @@ const LazyImageCard = ({ candidate, onClick, isVoted }: any) => {
         >
             <div className="flex items-center p-4 gap-6">
                 {/* Number Plate (Water Reflection style) */}
-                <div className="w-24 h-24 rounded-2xl bg-white/40 flex items-center justify-center border border-white/60 shadow-inner overflow-hidden flex-shrink-0">
-                    <span className="text-4xl font-black text-brand-accent/30 select-none tracking-tighter">
+                <div className="w-20 h-20 rounded-2xl bg-white/90 flex items-center justify-center border border-white/60 shadow-[inset_0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex-shrink-0">
+                    <span className="text-3xl font-black text-brand-accent select-none tracking-tighter">
                         {candidate.number}
                     </span>
                 </div>
@@ -56,8 +31,7 @@ const LazyImageCard = ({ candidate, onClick, isVoted }: any) => {
                 <div className="flex-1">
                     <div className="flex justify-between items-center">
                         <div>
-                            <p className="text-[10px] font-black text-brand-accent uppercase tracking-[0.2em] mb-1">{candidate.class}</p>
-                            <h3 className="text-xl font-black tracking-tighter text-brand-primary">{candidate.name}</h3>
+                            <h3 className="text-base sm:text-xl font-black tracking-tighter text-brand-primary">{candidate.name}</h3>
                         </div>
                         <div className="w-10 h-10 rounded-xl water-glass flex items-center justify-center group-hover:bg-brand-accent group-hover:text-white transition-all duration-300">
                             <ChevronRight size={20} />
@@ -124,7 +98,6 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
       setVotedCategories(prev => ({ ...prev, [activeCategory]: true }));
       setShowConfirmModal(false);
       setShowSuccess(true);
-      triggerConfetti(); 
       setTimeout(() => {
         setShowSuccess(false);
         setSelectedCandidate(null);
@@ -146,8 +119,8 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
       <header className="sticky top-0 z-40 water-glass border-b border-white/60">
         <div className="max-w-xl mx-auto px-6 h-20 flex items-center justify-between">
             <div className="flex flex-col">
-                <h1 className="text-2xl font-black tracking-tighter leading-none text-brand-primary">CEIT<span className="text-brand-accent">.</span>VOTE</h1>
-                <span className="text-[10px] font-black text-brand-muted tracking-[0.3em] uppercase mt-1">Fresher Celebration</span>
+                <h1 className="text-2xl font-black tracking-tighter leading-none text-brand-primary">TUM<span className="text-brand-accent">.</span>2026</h1>
+                <span className="text-[10px] font-black text-brand-muted tracking-[0.3em] uppercase mt-1">Fresher Welcome</span>
             </div>
             
             <button 
@@ -240,7 +213,7 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
                <div className="flex justify-between items-start mb-6 sm:mb-10">
                  <div>
                     <span className="text-brand-accent text-xs font-black tracking-[0.4em] uppercase block mb-1 opacity-60">Candidate {selectedCandidate.number}</span>
-                    <h3 className="text-3xl sm:text-4xl font-black tracking-tighter text-brand-primary leading-tight">
+                    <h3 className="text-2xl sm:text-3xl font-black tracking-tighter text-brand-primary leading-tight">
                         {selectedCandidate.name}
                     </h3>
                  </div>

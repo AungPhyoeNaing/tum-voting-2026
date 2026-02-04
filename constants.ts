@@ -41,7 +41,9 @@ export const CANDIDATES: Candidate[] = [
   { id: 'ms4', number: '04', name: 'မယွန်းနဒီဇော်', class: '04', categoryId: CategoryId.MISS, quote: "Kill 'em with kindness.", bio: "Community manager." },
   { id: 'ms5', number: '05', name: 'မအိအိအောင်', class: '05', categoryId: CategoryId.MISS, quote: "Duh.", bio: "Alternative thinker." },
   { id: 'ms6', number: '06', name: 'မထက်ဆုရတီ', class: '06', categoryId: CategoryId.MISS, quote: "New rules.", bio: "Defining new protocols." },
-  { id: 'ms7', number: '07', name: 'မစံထိပ်ထားခင်', class: '07', categoryId: CategoryId.MISS, quote: "Hear me roar.", bio: "Network administrator." },
+  { id: 'ms7', number: '07', name: 'မသုသီရိနိုင်', class: '07', categoryId: CategoryId.MISS, quote: "Hear me roar.", bio: "Network administrator." },
+  { id: 'ms8', number: '08', name: 'မစံထိပ်ထားခင်', class: '08', categoryId: CategoryId.MISS, quote: "Hear me roar.", bio: "Network administrator." },
+
 ];
 
 export const CATEGORIES = [
