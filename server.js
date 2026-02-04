@@ -105,6 +105,34 @@ const db = new sqlite3.Database(dbPath, (err) => {
     db.run(`CREATE INDEX IF NOT EXISTS idx_voterid_category ON votes(voterId, categoryId)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_hardware_ip ON votes(hardwareId, ipAddress)`);
 
+    // SETTINGS TABLE
+    db.run(`CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )`);
+
+    // Initialize Settings
+    const initSettings = () => {
+      db.get("SELECT value FROM settings WHERE key = 'system_open'", (err, row) => {
+        if (!row) {
+          db.run("INSERT INTO settings (key, value) VALUES ('system_open', 'false')");
+        } else {
+          isSystemOpen = row.value === 'true';
+          console.log(`[System] Loaded Config: System is ${isSystemOpen ? 'OPEN' : 'CLOSED'}`);
+        }
+      });
+
+      db.get("SELECT value FROM settings WHERE key = 'max_votes_ip'", (err, row) => {
+        if (!row) {
+          db.run("INSERT INTO settings (key, value) VALUES ('max_votes_ip', '3')");
+        } else {
+          maxVotesPerIp = parseInt(row.value, 10) || 3;
+          console.log(`[System] Loaded Config: Max Votes/IP = ${maxVotesPerIp}`);
+        }
+      });
+    };
+    initSettings();
+
       console.log('Database initialized successfully.');
       
       // Start server only after DB is ready
@@ -311,12 +339,14 @@ app.post('/api/system-status', (req, res) => {
   // Update Open/Closed Status
   if (typeof isOpen === 'boolean') {
     isSystemOpen = isOpen;
+    db.run("INSERT OR REPLACE INTO settings (key, value) VALUES ('system_open', ?)", [String(isSystemOpen)]);
     console.log(`[System] Voting status changed to: ${isSystemOpen ? 'OPEN' : 'CLOSED'}`);
   }
 
   // Update Dynamic IP Limit
   if (typeof newMaxVotes === 'number' && newMaxVotes > 0) {
     maxVotesPerIp = newMaxVotes;
+    db.run("INSERT OR REPLACE INTO settings (key, value) VALUES ('max_votes_ip', ?)", [String(maxVotesPerIp)]);
     console.log(`[System] Max votes per IP changed to: ${maxVotesPerIp}`);
   }
 
