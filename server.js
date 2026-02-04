@@ -323,6 +323,23 @@ app.post('/api/system-status', (req, res) => {
   return res.json({ success: true, isOpen: isSystemOpen, maxVotesPerIp });
 });
 
+// 6. Get Detailed Logs (Admin Only)
+app.get('/api/logs', (req, res) => {
+  const adminToken = getCookie(req, 'admin_session');
+  if (adminToken !== 'authorized_45644779') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const sql = `SELECT * FROM votes ORDER BY timestamp DESC LIMIT 1000`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(rows);
+  });
+});
+
 // SPA Fallback: Serve index.html for any unknown routes
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));

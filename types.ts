@@ -28,3 +28,14 @@ export interface AdminStats {
   votesPerCategory: Record<CategoryId, number>;
   leadingCandidates: Record<CategoryId, Candidate>;
 }
+
+export interface VoteRecord {
+  id: number;
+  candidateId: string;
+  categoryId: CategoryId;
+  ipAddress: string;
+  fingerprint: string;
+  voterId: string;
+  hardwareId: string;
+  timestamp: string;
+}

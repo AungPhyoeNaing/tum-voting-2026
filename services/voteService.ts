@@ -173,6 +173,19 @@ export const getVoteStats = async (): Promise<VoteState> => {
   }
 };
 
+export const getVoteLogs = async (): Promise<any[]> => {
+  try {
+    const response = await fetch(`${API_URL}/logs`);
+    if (response.ok) {
+      return await response.json();
+    }
+    return [];
+  } catch (error) {
+    console.error('Error fetching logs:', error);
+    return [];
+  }
+};
+
 export const resetAllVotes = async () => {
   const confirmed = confirm("Are you sure? This will wipe the database permanently.");
   if (!confirmed) return;

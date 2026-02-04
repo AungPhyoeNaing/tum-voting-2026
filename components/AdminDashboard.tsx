@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { VoteState, CategoryId, Candidate } from '../types';
+import { VoteState, CategoryId, Candidate, VoteRecord } from '../types';
 import { CANDIDATES, CATEGORIES } from '../constants';
-import { getVoteStats, resetAllVotes } from '../services/voteService';
-import { LogOut, LayoutDashboard, Users, Trophy, Activity, RefreshCw, Sparkles, Lock, Unlock, Settings, SlidersHorizontal } from 'lucide-react';
+import { getVoteStats, resetAllVotes, getVoteLogs } from '../services/voteService';
+import { LogOut, LayoutDashboard, Users, Trophy, Activity, RefreshCw, Sparkles, Lock, Unlock, Settings, SlidersHorizontal, List, Table } from 'lucide-react';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -10,6 +10,8 @@ interface AdminDashboardProps {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
   const [votes, setVotes] = useState<VoteState>({});
+  const [logs, setLogs] = useState<VoteRecord[]>([]);
+  const [viewMode, setViewMode] = useState<'stats' | 'logs'>('stats');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSystemOpen, setIsSystemOpen] = useState(false);
@@ -17,8 +19,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
 
   const fetchData = async (silent = false) => {
     if (!silent) setIsRefreshing(true);
+    
     const data = await getVoteStats();
     setVotes(data);
+
+    if (viewMode === 'logs') {
+        const logData = await getVoteLogs();
+        setLogs(logData);
+    }
     
     // Also fetch system status
     try {
@@ -74,6 +82,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
     const interval = setInterval(() => fetchData(true), 5000);
     return () => clearInterval(interval);
   }, []);
+  
+  // Re-fetch when view mode changes
+  useEffect(() => {
+    fetchData();
+  }, [viewMode]);
 
   const dashboardData = useMemo(() => {
     const totalVotes = Object.values(votes).reduce((a: number, b: number) => a + b, 0);
@@ -112,12 +125,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
 
   const { totalVotes, categoryStats } = dashboardData;
 
+  const getCandidateName = (id: string) => {
+      return CANDIDATES.find(c => c.id === id)?.name || id;
+  };
+
   return (
     <div className="min-h-screen text-brand-primary pb-20 font-sans relative overflow-x-hidden">
       
       {/* Defined Water Header */}
       <header className="sticky top-0 z-40 water-glass border-b border-white/60">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row gap-4 justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="water-glass p-2.5 rounded-xl">
               <LayoutDashboard size={24} className="text-brand-accent" />
@@ -142,6 +159,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
               </div>
             </div>
           </div>
+          
+          <div className="flex items-center gap-2 bg-slate-900/5 p-1 rounded-xl border border-white/40">
+             <button
+                onClick={() => setViewMode('stats')}
+                className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${viewMode === 'stats' ? 'bg-white shadow-stacked text-brand-primary' : 'text-brand-muted hover:text-brand-primary'}`}
+             >
+                <Activity size={16} /> Stats
+             </button>
+             <button
+                onClick={() => setViewMode('logs')}
+                className={`px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all ${viewMode === 'logs' ? 'bg-white shadow-stacked text-brand-primary' : 'text-brand-muted hover:text-brand-primary'}`}
+             >
+                <List size={16} /> Logs
+             </button>
+          </div>
+
           <div className="flex items-center gap-3">
             <button 
                 onClick={() => fetchData(false)}
@@ -162,6 +195,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
         </div>
       </header>
 
+      {viewMode === 'stats' ? (
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
         
         {/* KPI Cards */}
@@ -355,6 +389,60 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
           ))}
         </div>
       </main>
+      ) : (
+        <main className="max-w-7xl mx-auto px-6 py-8 animate-fade-in">
+           <div className="water-glass rounded-3xl shadow-stacked overflow-hidden">
+               <div className="px-6 py-5 border-b border-white/60 bg-white/50">
+                  <h3 className="font-black text-brand-primary text-xl flex items-center gap-2">
+                      <List size={20} /> RAW VOTING LOGS (Last 1000)
+                  </h3>
+               </div>
+               <div className="overflow-x-auto">
+                   <table className="w-full text-left text-sm">
+                       <thead>
+                           <tr className="bg-white/40 border-b border-white/60 text-brand-muted uppercase text-[10px] tracking-widest font-black">
+                               <th className="px-6 py-4">Time</th>
+                               <th className="px-6 py-4">Category</th>
+                               <th className="px-6 py-4">Candidate</th>
+                               <th className="px-6 py-4">IP Address</th>
+                               <th className="px-6 py-4">Device Fingerprint</th>
+                           </tr>
+                       </thead>
+                       <tbody className="divide-y divide-white/40">
+                           {logs.map((log) => (
+                               <tr key={log.id} className="hover:bg-white/40 transition-colors">
+                                   <td className="px-6 py-3 font-mono text-xs font-bold text-slate-600">
+                                       {new Date(log.timestamp).toLocaleString()}
+                                   </td>
+                                   <td className="px-6 py-3 font-black text-brand-primary">
+                                       {log.categoryId}
+                                   </td>
+                                   <td className="px-6 py-3">
+                                       <span className="font-bold text-brand-accent">{getCandidateName(log.candidateId)}</span>
+                                   </td>
+                                   <td className="px-6 py-3 font-mono text-xs">
+                                       {log.ipAddress}
+                                   </td>
+                                   <td className="px-6 py-3 font-mono text-[10px] text-slate-500 max-w-xs truncate" title={log.fingerprint + '\n' + log.hardwareId}>
+                                       {log.fingerprint?.substring(0, 12)}...
+                                       <br/>
+                                       <span className="opacity-50">{log.hardwareId?.split('|').slice(0,2).join('|')}</span>
+                                   </td>
+                               </tr>
+                           ))}
+                           {logs.length === 0 && (
+                               <tr>
+                                   <td colSpan={5} className="px-6 py-10 text-center text-brand-muted font-bold">
+                                       No records found.
+                                   </td>
+                               </tr>
+                           )}
+                       </tbody>
+                   </table>
+               </div>
+           </div>
+        </main>
+      )}
     </div>
   );
 };
