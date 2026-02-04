@@ -153,6 +153,42 @@ const rateLimit = (limit, windowMs) => {
 
 // --- API Endpoints ---
 
+// 0. Health Check (Diagnostics)
+app.get('/api/health', (req, res) => {
+  const fs = require('fs');
+  const dbExists = fs.existsSync(dbPath);
+  
+  // Try to write a temp file to check write permissions
+  let canWrite = false;
+  try {
+    const testFile = join(__dirname, '.write_test');
+    fs.writeFileSync(testFile, 'test');
+    fs.unlinkSync(testFile);
+    canWrite = true;
+  } catch (e) {
+    canWrite = false;
+  }
+
+  const dbStatus = {
+    uptime: process.uptime(),
+    dbPath,
+    dbExists,
+    canWriteToDir: canWrite,
+    dbConnection: 'Checking...',
+    error: null
+  };
+
+  db.get('SELECT 1', (err) => {
+    if (err) {
+      dbStatus.dbConnection = 'FAILED';
+      dbStatus.error = err.message;
+      return res.status(500).json(dbStatus);
+    }
+    dbStatus.dbConnection = 'OK';
+    res.json(dbStatus);
+  });
+});
+
 // 1. Get Stats
 app.get('/api/stats', (req, res) => {
   const sql = `SELECT candidateId, COUNT(*) as count FROM votes GROUP BY candidateId`;
