@@ -21,7 +21,7 @@ export const CANDIDATES: Candidate[] = [
   { id: 'q5', number: '05', name: 'မနန်းမိုနွံဟွမ်', class: '05', categoryId: CategoryId.QUEEN, quote: "Creativity takes courage.", bio: "Graphic design lead." },
   { id: 'q6', number: '06', name: 'မအိအိလွင်', class: '06', categoryId: CategoryId.QUEEN, quote: "Be the change.", bio: "Environmental club president." },
   { id: 'q7', number: '07', name: 'မဟန်နီကို', class: '07', categoryId: CategoryId.QUEEN, quote: "Connect, collaborate, create.", bio: "Networking specialist." },
-  { id: 'q8', number: '08', name: 'မနန်ဖွေးလောဝ်', class: '08', categoryId: CategoryId.QUEEN, quote: "Grace under pressure.", bio: "Public speaking champion." },
+  { id: 'q8', number: '08', name: 'မနန်းဖွေးလောဝ်', class: '08', categoryId: CategoryId.QUEEN, quote: "Grace under pressure.", bio: "Public speaking champion." },
   { id: 'q9', number: '09', name: 'မယုမွန်ထွန်း', class: '09', categoryId: CategoryId.QUEEN, quote: "Logic will get you from A to B. Imagination will take you everywhere.", bio: "Algorithm ace." },
   { id: 'q10', number: '10', name: 'မဇူးဇူးအောင်', class: '10', categoryId: CategoryId.QUEEN, quote: "Logic will get you from A to B. Imagination will take you everywhere.", bio: "Algorithm ace." },
 
