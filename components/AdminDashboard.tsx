@@ -273,11 +273,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                 <div className="p-6 flex flex-col items-center text-center">
                    <div className="relative mb-4">
                      <div className="absolute inset-0 bg-yellow-200 rounded-full animate-pulse blur-xl opacity-50"></div>
-                     <img 
-                        src={cat.leader.imageUrl} 
-                        className="w-28 h-28 rounded-full object-cover border-4 border-black shadow-neo relative z-10 bg-slate-100"
-                        alt="Leader"
-                     />
+                     <div className="w-28 h-28 rounded-full border-4 border-black shadow-neo relative z-10 bg-slate-100 flex items-center justify-center">
+                        <span className="text-4xl font-black text-slate-400">#{cat.leader.number}</span>
+                     </div>
                      <div className="absolute -bottom-4 -right-4 z-20 bg-yellow-400 text-black text-sm font-black px-3 py-1 rounded-full shadow-neo border-2 border-black flex items-center gap-1 transform rotate-6">
                         <Trophy size={14} className="fill-white" /> 1st
                      </div>
@@ -333,11 +331,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                       `}>
                         {idx + 1}
                       </div>
-                      <img 
-                        src={candidate.imageUrl} 
-                        className="w-12 h-12 rounded-full object-cover border-2 border-black shadow-sm bg-slate-200"
-                        loading="lazy"
-                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-center mb-1">
                           <h4 className="font-bold text-black text-base truncate pr-2">

@@ -33,9 +33,8 @@ const triggerConfetti = async () => {
   fire(0.1, { spread: 120, startVelocity: 45 });
 };
 
-// Sub-component for efficient image loading
+// Sub-component for efficient display (Image removed)
 const LazyImageCard = ({ candidate, onClick, isVoted, gradient, index }: any) => {
-    const [isLoaded, setIsLoaded] = useState(false);
     
     return (
         <div 
@@ -48,25 +47,12 @@ const LazyImageCard = ({ candidate, onClick, isVoted, gradient, index }: any) =>
                 animationDuration: `${6 + Math.random()}s`
             }}
         >
-            {/* Image Container */}
-            <div className="aspect-[4/5] bg-yellow-100 relative overflow-hidden rounded-xl m-2 border-2 border-black">
-            {/* Skeleton Loader */}
-            {!isLoaded && (
-                <div className="absolute inset-0 bg-yellow-200 animate-pulse z-0" />
-            )}
-            
-            <img 
-                src={candidate.imageUrl} 
-                alt={candidate.name}
-                className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-                loading="lazy"
-                onLoad={() => setIsLoaded(true)}
-            />
-            
-            {/* Number Badge */}
-            <div className="absolute top-2 left-2 bg-white text-black text-xs font-black px-2 py-1 rounded-lg border-2 border-black shadow-neo-sm z-10 transform -rotate-6">
-                #{candidate.number}
-            </div>
+            {/* Number Container (Replaces Image) */}
+            <div className="aspect-[4/5] bg-yellow-100 relative overflow-hidden rounded-xl m-2 border-2 border-black flex items-center justify-center">
+                <span className="text-6xl font-black text-black/20 select-none">#{candidate.number}</span>
+                <div className="absolute top-2 left-2 bg-white text-black text-xs font-black px-2 py-1 rounded-lg border-2 border-black shadow-neo-sm z-10 transform -rotate-6">
+                    #{candidate.number}
+                </div>
             </div>
             
             <div className="p-3 text-center">
@@ -307,18 +293,8 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
                 <X size={24} />
             </button>
 
-            {/* Image */}
-            <div className="w-full aspect-square relative shrink-0 bg-yellow-50 group border-b-4 border-black">
-               <img 
-                 src={selectedCandidate.imageUrl} 
-                 className="w-full h-full object-cover"
-                 alt={selectedCandidate.name}
-               />
-               <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent" />
-            </div>
-
             {/* Content */}
-            <div className="p-6 pt-0 flex flex-col relative z-10 -mt-10 overflow-y-auto no-scrollbar">
+            <div className="p-6 pt-12 flex flex-col relative z-10 overflow-y-auto no-scrollbar">
                <div className="text-center">
                  <span className={`inline-block px-4 py-1.5 mt-1 rounded-full text-md font-black text-black ${activeColor} mb-3 border-2 border-black shadow-neo transform -rotate-2`}>
                     #{selectedCandidate.number}
@@ -350,8 +326,8 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
           <div className="bg-white rounded-3xl w-full max-w-xs p-6 border-4 border-black shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] animate-slide-up relative overflow-hidden">
              
             <div className="flex flex-col items-center text-center mt-2">
-              <div className="w-24 h-24 rounded-full border-4 border-black shadow-neo mb-4 overflow-hidden bg-slate-100">
-                 <img src={selectedCandidate.imageUrl} className="w-full h-full object-cover" />
+              <div className="w-24 h-24 rounded-full border-4 border-black shadow-neo mb-4 overflow-hidden bg-slate-100 flex items-center justify-center">
+                 <span className="text-3xl font-black text-slate-400">#{selectedCandidate.number}</span>
               </div>
               
               <h3 className="text-3xl font-black text-black mb-3">ပေးမှာသေချာပြီလား</h3>

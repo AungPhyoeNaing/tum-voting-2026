@@ -11,7 +11,6 @@ export interface Candidate {
   name: string;
   class: string;
   categoryId: CategoryId;
-  imageUrl: string;
   bio?: string;
   quote?: string;
 }
