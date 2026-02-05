@@ -110,7 +110,7 @@ export const hasVotedInCategory = (categoryId: string): boolean => {
 export const castVote = async (candidateId: string, categoryId: string): Promise<{ success: boolean; error?: string }> => {
   // 0. Security Block: Restricted Browsers (Firefox, Opera, UC)
   if (isBlockedBrowser()) {
-    return { success: false, error: 'သူငယ်ချင်းရေ Security Issues လေးတွေရှိတာကြောင့်မို့ ဒီ Browser နဲ့ မ vote ပါနဲ့နော်. Please use Chrome,Edge,Safari,Samaung or other NORMAL browsers. ပြန်ပြီး QR scan မလုပ်ချင်ရင် www.totumdy.com ကို ဝင်ပြီး Voteလို့ရပါတယ် . ကျေးဇူးပါနော်' };
+    return { success: false, error: 'သူငယ်ချင်းရေ Security Issues လေးတွေရှိတာကြောင့်မို့ ဒီ Browser နဲ့ မ vote ပါနဲ့နော်. Please use Chrome,Edge,Safari,Samaung or other NORMAL browsers တွေကနေ QR scan ပြန်ုလုပ်ပြီး Voteလို့ရပါတယ် . ကျေးဇူးပါနော်' };
   }
 
   // 1. Client-side check
