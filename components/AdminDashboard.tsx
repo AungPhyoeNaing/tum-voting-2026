@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { VoteState, CategoryId, Candidate, VoteRecord } from '../types';
 import { CANDIDATES, CATEGORIES } from '../constants';
 import { getVoteStats, resetAllVotes, getVoteLogs } from '../services/voteService';
-import { LogOut, LayoutDashboard, Users, Trophy, Activity, RefreshCw, Sparkles, Lock, Unlock, Settings, SlidersHorizontal, List, Table, Minus, Plus } from 'lucide-react';
+import { LogOut, LayoutDashboard, Users, Trophy, Activity, RefreshCw, Sparkles, Lock, Unlock, Settings, SlidersHorizontal, List, Table, Minus, Plus, Filter, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -17,28 +17,100 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
   const [isSystemOpen, setIsSystemOpen] = useState(false);
   const [maxVotesPerIp, setMaxVotesPerIp] = useState(3);
 
-  const fetchData = async (silent = false) => {
+  // Pagination & Filters
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [categoryFilter, setCategoryFilter] = useState('ALL');
+  
+  // Custom Dropdown State
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Ref to access fresh state inside the interval closure
+  const stateRef = useRef({ currentPage, categoryFilter, viewMode });
+  const isFetchingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    stateRef.current = { currentPage, categoryFilter, viewMode };
+  }, [currentPage, categoryFilter, viewMode]);
+
+  const fetchData = React.useCallback(async (silent = false) => {
+    // Strategy:
+    // 1. If AUTO-POLL (silent): Skip if busy.
+    // 2. If MANUAL (user action): Abort previous, start new.
+    
+    if (silent && isFetchingRef.current) return;
+    
+    if (!silent) {
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    isFetchingRef.current = true;
+    
     if (!silent) setIsRefreshing(true);
     
-    const data = await getVoteStats();
-    setVotes(data);
-
-    if (viewMode === 'logs') {
-        const logData = await getVoteLogs();
-        setLogs(logData);
-    }
-    
-    // Also fetch system status
     try {
-        const res = await fetch('/api/system-status');
-        const status = await res.json();
-        setIsSystemOpen(status.isOpen);
-        if (status.maxVotesPerIp) setMaxVotesPerIp(status.maxVotesPerIp);
-    } catch (e) { console.error("Failed to fetch status"); }
+        // 1. Fetch Stats (Always)
+        const data = await getVoteStats(controller.signal);
+        setVotes(data);
 
-    setLastUpdated(new Date());
-    if (!silent) setIsRefreshing(false);
-  };
+        // 2. Fetch Logs (Conditional)
+        const current = stateRef.current;
+        
+        const isLive = current.currentPage === 1 && current.categoryFilter === 'ALL';
+        
+        if (current.viewMode === 'logs' && (!silent || isLive)) {
+            const logData = await getVoteLogs(
+                current.currentPage, 
+                50, 
+                current.categoryFilter === 'ALL' ? '' : current.categoryFilter,
+                controller.signal
+            );
+            if (!controller.signal.aborted) {
+                setLogs(logData.logs);
+                setTotalPages(logData.pagination.pages);
+            }
+        }
+        
+        // 3. System Status
+        if (!controller.signal.aborted) {
+            try {
+                const res = await fetch('/api/system-status', { signal: controller.signal });
+                const status = await res.json();
+                setIsSystemOpen(status.isOpen);
+                if (status.maxVotesPerIp) setMaxVotesPerIp(status.maxVotesPerIp);
+            } catch (e) { /* Ignore status fetch errors */ }
+        }
+
+    } catch (e: any) { 
+        if (e.name !== 'AbortError') {
+             console.error("Failed to fetch data", e); 
+        }
+    } finally {
+        if (abortControllerRef.current === controller) {
+             isFetchingRef.current = false;
+             abortControllerRef.current = null;
+             if (!silent) setIsRefreshing(false);
+             setLastUpdated(new Date());
+        }
+    }
+  }, []);
 
   const toggleSystem = async () => {
       const newState = !isSystemOpen;
@@ -77,16 +149,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
     }
   };
 
+  // Initial Poll Setup
   useEffect(() => {
-    fetchData();
+    fetchData(); // Initial fetch
     const interval = setInterval(() => fetchData(true), 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchData]);
   
-  // Re-fetch when view mode changes
+  // Trigger fetch when Filters Change
   useEffect(() => {
-    fetchData();
-  }, [viewMode]);
+    if (viewMode === 'logs') {
+        fetchData(false);
+    }
+  }, [currentPage, categoryFilter, viewMode, fetchData]);
 
   const dashboardData = useMemo(() => {
     const totalVotes = Object.values(votes).reduce((a: number, b: number) => a + b, 0);
@@ -386,12 +461,50 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
       </main>
       ) : (
         <main className="max-w-7xl mx-auto px-6 py-8 animate-fade-in">
-           <div className="water-glass rounded-3xl shadow-stacked overflow-hidden">
-               <div className="px-6 py-5 border-b border-white/60 bg-white/50">
+           <div className="water-glass rounded-3xl shadow-stacked overflow-hidden flex flex-col">
+               {/* Header & Controls */}
+               <div className="px-6 py-5 border-b border-white/60 bg-white/50 flex flex-col md:flex-row gap-4 justify-between items-center">
                   <h3 className="font-black text-brand-primary text-xl flex items-center gap-2">
-                      <List size={20} /> RAW VOTING LOGS (Last 1000)
+                      <List size={20} /> VOTING LOGS
                   </h3>
+                  
+                  <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                      {/* Custom Filter Dropdown */}
+                      <div className="relative" ref={filterRef}>
+                          <button
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            className="pl-10 pr-10 py-2 rounded-xl bg-white/60 border border-white/60 focus:outline-none focus:ring-2 focus:ring-brand-accent/20 text-sm font-bold text-brand-primary hover:bg-white/80 transition-colors w-full sm:w-48 text-left flex items-center justify-between relative"
+                          >
+                             <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-muted" size={16} />
+                             <span className="truncate">
+                                {categoryFilter === 'ALL' ? 'All Categories' : CATEGORIES.find(c => c.id === categoryFilter)?.label}
+                             </span>
+                             <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted transition-transform duration-200 ${isFilterOpen ? 'rotate-180' : ''}`} size={16} />
+                          </button>
+
+                          {isFilterOpen && (
+                            <div className="absolute top-full right-0 mt-2 w-full sm:w-56 bg-white/90 backdrop-blur-xl border border-white/60 rounded-xl shadow-stacked overflow-hidden z-50 animate-fade-in">
+                                <div 
+                                    onClick={() => { setCategoryFilter('ALL'); setCurrentPage(1); setIsFilterOpen(false); }}
+                                    className={`px-4 py-3 text-sm font-bold cursor-pointer transition-colors ${categoryFilter === 'ALL' ? 'bg-brand-accent/10 text-brand-accent' : 'text-brand-primary hover:bg-white/50'}`}
+                                >
+                                    All Categories
+                                </div>
+                                {CATEGORIES.map(c => (
+                                    <div 
+                                        key={c.id}
+                                        onClick={() => { setCategoryFilter(c.id); setCurrentPage(1); setIsFilterOpen(false); }}
+                                        className={`px-4 py-3 text-sm font-bold cursor-pointer transition-colors border-t border-white/50 ${categoryFilter === c.id ? 'bg-brand-accent/10 text-brand-accent' : 'text-brand-primary hover:bg-white/50'}`}
+                                    >
+                                        {c.label}
+                                    </div>
+                                ))}
+                            </div>
+                          )}
+                      </div>
+                  </div>
                </div>
+
                <div className="overflow-x-auto">
                    <table className="w-full text-left text-sm">
                        <thead>
@@ -434,6 +547,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                            )}
                        </tbody>
                    </table>
+               </div>
+               
+               {/* Pagination */}
+               <div className="px-6 py-4 border-t border-white/60 bg-white/40 flex justify-between items-center">
+                  <span className="text-xs font-bold text-brand-muted">
+                      Page {currentPage} of {totalPages}
+                  </span>
+                  <div className="flex items-center gap-2">
+                      <button 
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        className="p-2 rounded-lg bg-white shadow-stacked disabled:opacity-50 disabled:shadow-none hover:bg-brand-accent hover:text-white transition-all text-brand-primary"
+                      >
+                          <ChevronLeft size={16} />
+                      </button>
+                      <button 
+                        disabled={currentPage >= totalPages}
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        className="p-2 rounded-lg bg-white shadow-stacked disabled:opacity-50 disabled:shadow-none hover:bg-brand-accent hover:text-white transition-all text-brand-primary"
+                      >
+                          <ChevronRight size={16} />
+                      </button>
+                  </div>
                </div>
            </div>
         </main>

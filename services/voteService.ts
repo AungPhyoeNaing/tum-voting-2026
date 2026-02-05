@@ -159,30 +159,48 @@ export const castVote = async (candidateId: string, categoryId: string): Promise
   }
 };
 
-export const getVoteStats = async (): Promise<VoteState> => {
+export const getVoteStats = async (signal?: AbortSignal): Promise<VoteState> => {
   try {
-    const response = await fetch(`${API_URL}/stats`);
+    const response = await fetch(`${API_URL}/stats`, { signal });
     if (response.ok) {
       return await response.json();
     }
     console.error('Failed to fetch stats');
     return {};
-  } catch (error) {
+  } catch (error: any) {
+    if (error.name === 'AbortError') throw error;
     console.error('Error fetching stats:', error);
     return {};
   }
 };
 
-export const getVoteLogs = async (): Promise<any[]> => {
+export interface LogResponse {
+  logs: any[];
+  pagination: {
+      total: number;
+      pages: number;
+      currentPage: number;
+      limit: number;
+  };
+}
+
+export const getVoteLogs = async (page = 1, limit = 50, category = '', signal?: AbortSignal): Promise<LogResponse> => {
   try {
-    const response = await fetch(`${API_URL}/logs`);
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      category
+    });
+
+    const response = await fetch(`${API_URL}/logs?${params}`, { signal });
     if (response.ok) {
       return await response.json();
     }
-    return [];
-  } catch (error) {
+    return { logs: [], pagination: { total: 0, pages: 0, currentPage: 1, limit: 50 } };
+  } catch (error: any) {
+    if (error.name === 'AbortError') throw error; // Re-throw aborts
     console.error('Error fetching logs:', error);
-    return [];
+    return { logs: [], pagination: { total: 0, pages: 0, currentPage: 1, limit: 50 } };
   }
 };
 

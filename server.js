@@ -100,6 +100,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
     // INDEXING
     db.run(`CREATE INDEX IF NOT EXISTS idx_candidate ON votes(candidateId)`);
+    db.run(`CREATE INDEX IF NOT EXISTS idx_timestamp ON votes(timestamp)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_ip_category ON votes(ipAddress, categoryId)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_fingerprint_category ON votes(fingerprint, categoryId)`);
     db.run(`CREATE INDEX IF NOT EXISTS idx_voterid_category ON votes(voterId, categoryId)`);
@@ -353,20 +354,62 @@ app.post('/api/system-status', (req, res) => {
   return res.json({ success: true, isOpen: isSystemOpen, maxVotesPerIp });
 });
 
-// 6. Get Detailed Logs (Admin Only)
+// 6. Get Detailed Logs (Admin Only) - Paginated & Filtered
 app.get('/api/logs', (req, res) => {
   const adminToken = getCookie(req, 'admin_session');
   if (adminToken !== 'authorized_45644779') {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const sql = `SELECT * FROM votes ORDER BY timestamp DESC LIMIT 1000`;
-  db.all(sql, [], (err, rows) => {
+  // Parse Query Params
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 50;
+  const category = req.query.category ? String(req.query.category).trim() : '';
+  const offset = (page - 1) * limit;
+
+  // Build Query Conditions
+  let whereClauses = [];
+  let params = [];
+
+  if (category && category !== 'ALL') {
+    whereClauses.push("categoryId = ?");
+    params.push(category);
+  }
+
+  const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+  // Query 1: Get Total Count (for pagination)
+  const countSql = `SELECT COUNT(*) as count FROM votes ${whereSql}`;
+  
+  db.get(countSql, params, (err, row) => {
     if (err) {
-      console.error(err);
+      console.error("Count Error:", err);
       return res.status(500).json({ error: 'Database error' });
     }
-    res.json(rows);
+    
+    const totalRecords = row ? row.count : 0;
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    // Query 2: Get Paginated Data
+    const dataSql = `SELECT * FROM votes ${whereSql} ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
+    const dataParams = [...params, limit, offset];
+
+    db.all(dataSql, dataParams, (err, rows) => {
+      if (err) {
+        console.error("Fetch Error:", err);
+        return res.status(500).json({ error: 'Database error' });
+      }
+      
+      res.json({
+        logs: rows,
+        pagination: {
+          total: totalRecords,
+          pages: totalPages,
+          currentPage: page,
+          limit: limit
+        }
+      });
+    });
   });
 });
 
