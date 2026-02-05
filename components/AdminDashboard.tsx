@@ -344,8 +344,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
         {/* 📊 DETAILED BREAKDOWN */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
           {categoryStats.map(cat => (
-            <div key={cat.id} className="water-glass rounded-3xl shadow-stacked overflow-hidden flex flex-col">
-              <div className="px-6 py-5 border-b border-white/60 flex justify-between items-center bg-white/50">
+            <div key={cat.id} className="water-glass rounded-3xl shadow-stacked flex flex-col">
+              <div className="px-6 py-5 border-b border-white/80 flex justify-between items-center bg-white/60 rounded-t-3xl">
                 <h3 className="font-black text-brand-primary text-xl flex items-center gap-3">
                   <span className={`w-4 h-4 rounded-full border border-white/50 bg-brand-accent/30`}></span>
                   {cat.label} Race
@@ -355,13 +355,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                 </span>
               </div>
               
-              <div className="divide-y divide-white/40 flex-1">
+              <div className="p-4 space-y-4 flex-1">
                 {cat.candidates.map((candidate, idx) => (
-                  <div key={candidate.id} className="px-6 py-4 bg-white/40 hover:bg-white/60 transition-colors relative overflow-hidden group">
+                  <div key={candidate.id} className="px-6 py-6 bg-white/70 border border-white/90 rounded-2xl shadow-stacked hover:shadow-water-light hover:bg-white/90 transition-all relative group">
                     
-                    <div className="flex items-center gap-4 relative z-10">
+                    <div className="flex items-start gap-4 relative z-10">
                       <div className={`
-                        font-black w-8 h-8 flex items-center justify-center rounded-full text-sm border border-white/50 shadow-stacked
+                        font-black w-8 h-8 flex items-center justify-center rounded-full text-sm border border-white/50 shadow-stacked mt-1.5
                         ${idx === 0 ? 'bg-brand-accent text-white' : 
                           idx === 1 ? 'bg-blue-300 text-brand-primary' : 
                           idx === 2 ? 'bg-orange-300 text-brand-primary' : 'bg-white text-brand-muted'}
@@ -369,24 +369,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                         {idx + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-center mb-1">
-                          <h4 className="font-bold text-brand-primary text-base truncate pr-2">
-                            {candidate.name}
+                        <div className="flex justify-between items-baseline mb-4">
+                          <h4 className="font-bold text-brand-primary text-xl leading-normal truncate pr-2">
+                            {candidate.name} <span className="text-base text-brand-muted ml-1">#{candidate.number}</span>
                           </h4>
-                          <span className="font-black text-brand-primary text-lg">
+                          <span className="font-black text-brand-primary text-2xl leading-normal">
                             {candidate.votes}
                           </span>
                         </div>
                         
                         {/* Water Progress Bar */}
-                        <div className="relative w-full h-4 bg-white/50 border border-white/50 rounded-full overflow-hidden">
+                        <div className="relative w-full h-4 bg-white/50 border border-white/50 rounded-full overflow-hidden mt-5">
                            <div 
                               className={`absolute top-0 left-0 h-full border-r border-white/50 bg-brand-accent`}
                               style={{ width: `${candidate.percentage}%`, transition: 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1)' }}
                            ></div>
                         </div>
-                         <div className="flex justify-between items-center text-[10px] mt-1 font-bold text-brand-muted opacity-70">
-                          <span className="uppercase tracking-wider">{candidate.class}</span>
+                         <div className="flex justify-end items-center text-[10px] mt-1 font-bold text-brand-muted opacity-70">
                           <span className="font-mono">{candidate.percentage}%</span>
                         </div>
                       </div>
