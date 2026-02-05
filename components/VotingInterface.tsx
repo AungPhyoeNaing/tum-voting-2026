@@ -120,14 +120,15 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
         <div className="max-w-xl mx-auto px-6 h-20 flex items-center justify-between">
             <div className="flex flex-col">
                 <h1 className="text-2xl font-black tracking-tighter leading-none text-brand-primary">TUM<span className="text-brand-accent">.</span>2026</h1>
-                <span className="text-[10px] font-black text-brand-muted tracking-[0.3em] uppercase mt-1">Fresher Welcome</span>
+                <span className="text-[12px] font-black text-brand-accent tracking-[0.3em] uppercase mt-1">Fresher Welcome</span>
             </div>
             
             <button 
                 onClick={onAdminClick} 
-                className="w-10 h-10 flex items-center justify-center rounded-xl water-glass hover:bg-brand-accent hover:text-white transition-all duration-300"
+                className="w-10 h-10 flex items-center justify-center rounded-xl opacity-0 cursor-default"
+                title=""
             >
-                <Lock size={18} />
+                {/* Secret Admin Access */}
             </button>
         </div>
         
@@ -157,7 +158,7 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
       </header>
 
       {/* Main Content (Stacked Column) */}
-      <main className="max-w-xl mx-auto px-6 pt-12 pb-32">
+      <main className="max-w-xl mx-auto px-6 pt-12 pb-10">
         {!isSystemOpen ? (
             <div className="text-center py-20 px-8 water-glass rounded-[40px] shadow-stacked animate-slide-up border-white/80">
                 <div className="w-20 h-20 bg-brand-surface rounded-3xl flex items-center justify-center mx-auto mb-8 border border-white/60">
@@ -212,7 +213,7 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
             <div className="p-6 pt-4 sm:p-12 sm:pt-8 text-center overflow-y-auto custom-scrollbar"> {/* Added overflow-y-auto and custom-scrollbar */}
                <div className="flex justify-between items-start mb-6 sm:mb-10">
                  <div>
-                    <span className="text-brand-accent text-xs font-black tracking-[0.4em] uppercase block mb-1 opacity-60">Candidate {selectedCandidate.number}</span>
+                    <span className="text-brand-accent text-xs font-black tracking-[0.4em] uppercase block mb-1 opacity-60">CONTESTANT {selectedCandidate.number}</span>
                     <h3 className="text-2xl sm:text-3xl font-black tracking-tighter text-brand-primary leading-tight">
                         {selectedCandidate.name}
                     </h3>
@@ -229,7 +230,7 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
                 onClick={handleInitiateVote}
                 className="w-full py-5 rounded-3xl font-black text-white bg-brand-primary hover:bg-brand-accent transition-all duration-500 flex items-center justify-center gap-4 text-xl shadow-stacked"
                >
-                CAST VOTE <ChevronRight size={24} />
+                VOTE NOW<ChevronRight size={24} />
                </button>
                
                <button 
@@ -249,7 +250,7 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
           <div className="max-w-sm w-full water-glass rounded-[40px] p-10 text-center border-white shadow-2xl">
              <h3 className="text-3xl font-black tracking-tighter mb-4">Confirm?</h3>
              <p className="text-slate-500 font-bold mb-12 text-balance">
-                You are voting for <span className="text-brand-primary font-black underline decoration-brand-accent decoration-4">{selectedCandidate.name}</span>.
+                You are voting for <span className="text-brand-accent font-black">{selectedCandidate.name}</span>.
              </p>
               
              <div className="flex flex-col gap-3">

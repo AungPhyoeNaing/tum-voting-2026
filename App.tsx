@@ -119,9 +119,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <>
-      {renderContent()}
-    </>
+    <div className="min-h-screen flex flex-col justify-between">
+      <div className="flex-grow">
+        {renderContent()}
+      </div>
+      <footer className="py-6 text-center text-[13px] font-black tracking-widest text-brand-muted/50 uppercase drop-shadow-[0_1px_0_rgba(255,255,255,0.8)]">
+        Developed by <br /> <span className="text-brand-accent">Aung Phyoe Naing</span> (CEIT)
+      </footer>
+    </div>
   );
 };
 

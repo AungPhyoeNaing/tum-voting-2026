@@ -421,7 +421,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                            {logs.map((log) => (
                                <tr key={log.id} className="hover:bg-white/40 transition-colors">
                                    <td className="px-6 py-3 font-mono text-xs font-bold text-slate-600">
-                                       {new Date(log.timestamp).toLocaleString()}
+                                       {new Date(log.timestamp.replace(' ', 'T') + 'Z').toLocaleString('en-US', { timeZone: 'Asia/Yangon' })}
                                    </td>
                                    <td className="px-6 py-3 font-black text-brand-primary">
                                        {log.categoryId}
