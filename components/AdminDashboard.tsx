@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { VoteState, CategoryId, Candidate, VoteRecord } from '../types';
 import { CANDIDATES, CATEGORIES } from '../constants';
 import { getVoteStats, resetAllVotes, getVoteLogs } from '../services/voteService';
-import { LogOut, LayoutDashboard, Users, Trophy, Activity, RefreshCw, Sparkles, Lock, Unlock, Settings, SlidersHorizontal, List, Table } from 'lucide-react';
+import { LogOut, LayoutDashboard, Users, Trophy, Activity, RefreshCw, Sparkles, Lock, Unlock, Settings, SlidersHorizontal, List, Table, Minus, Plus } from 'lucide-react';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -199,7 +199,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
       <main className="max-w-7xl mx-auto px-6 py-8 space-y-8 animate-fade-in">
         
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="p-6 rounded-3xl water-glass shadow-stacked hover:shadow-water-light transition-transform duration-300">
             <div className="flex items-center gap-3 mb-2">
               <div className="water-glass p-2 rounded-lg">
@@ -210,16 +210,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
             <div className="text-6xl font-black text-brand-primary tracking-tighter">{totalVotes}</div>
           </div>
           
-          <div className="p-6 rounded-3xl water-glass shadow-stacked hover:shadow-water-light transition-transform duration-300">
-            <div className="flex items-center gap-3 mb-2">
-               <div className="water-glass p-2 rounded-lg">
-                <Users size={20} className="text-emerald-500" />
-              </div>
-              <span className="text-sm font-bold text-brand-muted uppercase tracking-wider">Est. Voters</span>
-            </div>
-            <div className="text-6xl font-black text-brand-primary tracking-tighter">~{Math.ceil(totalVotes / 1.5)}</div>
-          </div>
-
           {/* System Status Card */}
           <div className="p-6 rounded-3xl water-glass shadow-stacked hover:shadow-water-light transition-transform duration-300 flex flex-col justify-between">
             <div>
@@ -266,32 +256,29 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
                     {maxVotesPerIp} {maxVotesPerIp === 1 ? 'Vote' : 'Votes'}
                  </span>
               </div>
-              <input 
-                type="range" 
-                min="1" 
-                max="20" 
-                step="1"
-                value={maxVotesPerIp}
-                onChange={(e) => changeIpLimit(parseInt(e.target.value))}
-                className="w-full h-2 bg-white/50 rounded-lg appearance-none cursor-pointer accent-brand-accent"
-              />
-              <p className="text-[10px] text-brand-muted/70 font-medium mt-2">Adjust max votes per IP (e.g., from public Wi-Fi hotspots).</p>
+              
+              <div className="flex items-center gap-3">
+                  <button 
+                    onClick={() => changeIpLimit(Math.max(1, maxVotesPerIp - 1))}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white shadow-stacked text-brand-primary hover:bg-brand-accent hover:text-white transition-colors border border-white/60"
+                  >
+                    <Minus size={18} />
+                  </button>
+                  
+                  <div className="flex-1 text-center font-black text-2xl text-brand-primary tracking-tighter bg-white/40 rounded-xl py-1 border border-white/40">
+                    {maxVotesPerIp}
+                  </div>
+
+                  <button 
+                    onClick={() => changeIpLimit(Math.min(20, maxVotesPerIp + 1))}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white shadow-stacked text-brand-primary hover:bg-brand-accent hover:text-white transition-colors border border-white/60"
+                  >
+                    <Plus size={18} />
+                  </button>
+              </div>
+              <p className="text-[10px] text-brand-muted/70 font-medium mt-3 text-center">Adjust limit for Wi-Fi hotspots</p>
             </div>
-            <button 
-                onClick={() => { 
-                    const password = prompt("Enter Admin Password to CONFIRM RESET:");
-                    if (password === "45644779") {
-                        if(confirm("FINAL WARNING: This will permanently delete ALL votes. Proceed?")) {
-                            resetAllVotes();
-                        }
-                    } else if (password !== null) {
-                        alert("Incorrect Password");
-                    }
-                }}
-                className="w-full mt-4 py-3 text-sm font-black text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-stacked hover:shadow-water-light transition-all uppercase tracking-wide"
-            >
-            RESET ALL VOTES
-            </button>
+            
           </div>
         </div>
 
@@ -451,6 +438,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onLogout }) => {
            </div>
         </main>
       )}
+
+      {/* SECRET RESET TRIGGER (Bottom Right Corner - Hidden) */}
+      <div 
+        onClick={() => {
+            const password = prompt("Enter Master Password:");
+            if (password === "45644779") {
+                 if(confirm("🚨 DANGER ZONE 🚨\n\nThis will PERMANENTLY DELETE all vote records.\nThere is no undo.\n\nAre you absolutely sure?")) {
+                     resetAllVotes();
+                 }
+            }
+        }}
+        className="fixed bottom-0 right-0 w-6 h-6 z-[100] cursor-default opacity-0" 
+      />
     </div>
   );
 };
