@@ -3,6 +3,9 @@
 
 A full-stack web application built for the IT Fresher 2026 voting event. This project provides a secure, real-time voting interface for users, backed by robust anti-cheat mechanisms, and a comprehensive Admin Dashboard to manage the event.
 
+> [!NOTE]
+> **Production Proven:** This exact codebase was hosted on a live production server and successfully used in the real TUM Fresher Welcome 2026 event. The database included in this repository contains the actual voting data from the event for demonstration purposes.
+
 ## ✨ Features
 
 - **Real-Time Voting:** Clean, responsive, and intuitive interface for casting votes.
