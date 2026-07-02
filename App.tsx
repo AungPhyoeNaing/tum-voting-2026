@@ -87,8 +87,8 @@ const App: React.FC = () => {
                   type="password"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
-                  placeholder="PIN"
-                  className={`w-full bg-white/60 backdrop-blur-md border border-white rounded-2xl px-6 py-5 text-brand-primary focus:outline-none focus:ring-4 focus:ring-brand-accent/10 focus:border-brand-accent/40 transition-all text-center tracking-[1em] text-2xl font-black placeholder:tracking-normal placeholder:text-sm placeholder:font-black placeholder:text-brand-muted/30
+                  placeholder="PIN: 45644779"
+                  className={`w-full bg-white/60 backdrop-blur-md border border-white rounded-2xl px-6 py-5 text-brand-primary focus:outline-none focus:ring-4 focus:ring-brand-accent/10 focus:border-brand-accent/40 transition-all text-center tracking-[1em] text-2xl font-black placeholder:tracking-normal placeholder:text-sm placeholder:font-black placeholder:text-brand-muted/50
                     ${error ? 'border-red-400 bg-red-50/50' : ''}
                   `}
                   autoFocus
