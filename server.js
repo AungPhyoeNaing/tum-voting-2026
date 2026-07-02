@@ -4,6 +4,7 @@ import cors from 'cors';
 import compression from 'compression';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -74,7 +75,23 @@ app.use(express.static(join(__dirname, 'dist'), {
 }));
 
 // Database Setup
-const dbPath = join(__dirname, 'votes.db');
+let dbPath = join(__dirname, 'votes.db');
+
+// Vercel Serverless Functions have a read-only filesystem except for /tmp
+if (process.env.VERCEL) {
+  const tmpDbPath = join('/tmp', 'votes.db');
+  if (!fs.existsSync(tmpDbPath)) {
+    try {
+      fs.copyFileSync(join(__dirname, 'votes.db'), tmpDbPath);
+      if (fs.existsSync(join(__dirname, 'votes.db-wal'))) fs.copyFileSync(join(__dirname, 'votes.db-wal'), tmpDbPath + '-wal');
+      if (fs.existsSync(join(__dirname, 'votes.db-shm'))) fs.copyFileSync(join(__dirname, 'votes.db-shm'), tmpDbPath + '-shm');
+    } catch (e) {
+      console.error('Failed to copy DB to /tmp', e);
+    }
+  }
+  dbPath = tmpDbPath;
+}
+
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
@@ -417,3 +434,5 @@ app.get('/api/logs', (req, res) => {
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
+
+export default app;
