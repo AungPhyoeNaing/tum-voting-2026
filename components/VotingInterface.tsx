@@ -125,10 +125,10 @@ const VotingInterface: React.FC<VotingInterfaceProps> = ({ onAdminClick }) => {
             
             <button 
                 onClick={onAdminClick} 
-                className="w-10 h-10 flex items-center justify-center rounded-xl opacity-0 cursor-default"
-                title=""
+                className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/40 hover:bg-white/60 text-brand-primary/40 hover:text-brand-primary transition-all cursor-pointer"
+                title="Admin Access"
             >
-                {/* Secret Admin Access */}
+                <Lock size={16} />
             </button>
         </div>
         

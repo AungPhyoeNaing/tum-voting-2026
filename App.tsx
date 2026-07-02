@@ -72,7 +72,13 @@ const App: React.FC = () => {
             
             <div className="text-center mb-10">
               <h2 className="text-4xl font-black tracking-tighter text-brand-primary mb-2">Login</h2>
-              <p className="text-brand-muted text-[10px] font-black uppercase tracking-[0.3em] opacity-60">Admin Gateway</p>
+              <p className="text-brand-muted text-[10px] font-black uppercase tracking-[0.3em] opacity-60 mb-6">Admin Gateway</p>
+              
+              <div className="bg-brand-primary/5 border border-brand-primary/10 rounded-xl p-4 text-left">
+                <p className="text-brand-primary/80 text-sm font-medium leading-relaxed">
+                  <strong className="text-brand-primary font-black">Note:</strong> The admin password is provided to recruiters and interviewers to view the real voted data <span className="opacity-70 text-xs">(and only for now)</span>.
+                </p>
+              </div>
             </div>
             
             <form onSubmit={handleAdminLogin} className="space-y-6">
