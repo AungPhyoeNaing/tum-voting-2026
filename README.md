@@ -1,5 +1,5 @@
 
-# IT Fresher Vote 2026 🗳️
+# Online Voting App for TUM Fesher Welcome 2026 🗳️
 
 A full-stack web application built for the IT Fresher 2026 voting event. This project provides a secure, real-time voting interface for users, backed by robust anti-cheat mechanisms, and a comprehensive Admin Dashboard to manage the event.
 
