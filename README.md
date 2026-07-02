@@ -70,7 +70,7 @@ The application will be available at `http://localhost:3000`. The Vite server au
 
 ## 🔒 Admin Access
 To access the admin panel, navigate to `http://localhost:3000/admin`.
-- **Default PIN:** `45644779` (Configured in `server.js`)
+
 
 ## ☁️ Deployment Notes (Vercel)
 
